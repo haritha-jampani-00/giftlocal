@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#E8E0F3"/>
+  <rect x="40" y="40" width="1120" height="550" rx="30" fill="white" opacity="0.7"/>
+  <text x="600" y="240" text-anchor="middle" font-family="system-ui, sans-serif" font-size="72" font-weight="700" fill="#4A4068">
+    🎁 gift<tspan fill="#C5B4E3">local</tspan>
+  </text>
+  <text x="600" y="320" text-anchor="middle" font-family="system-ui, sans-serif" font-size="32" fill="#7A6F8E">
+    Find the perfect gift for anyone, anywhere
+  </text>
+  <text x="600" y="400" text-anchor="middle" font-family="system-ui, sans-serif" font-size="22" fill="#A89EC2">
+    AI-powered · location-aware · free to use
+  </text>
+  <!-- decorative elements -->
+  <text x="150" y="520" font-size="50">🎀</text>
+  <text x="350" y="540" font-size="40">✨</text>
+  <text x="800" y="530" font-size="45">🎁</text>
+  <text x="1000" y="510" font-size="35">💝</text>
+</svg>

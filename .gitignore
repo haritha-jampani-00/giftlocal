@@ -1,0 +1,17 @@
+# Environment variables — never commit these
+.env
+.env.local
+.env.production
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# If you later add Node.js / npm
+node_modules/
+dist/
+.vercel/

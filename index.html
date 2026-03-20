@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GiftLocal — Thoughtful gifts, rooted in where they live</title>
+  <meta name="description" content="Find thoughtful, locally-rooted gift ideas for anyone, anywhere. AI-powered recommendations based on their city, personality, and occasion. Free to use."/>
+  <meta name="keywords" content="gift ideas, local gifts, personalized gifts, gift recommendations, AI gift finder, experience gifts, city gifts"/>
+  <meta name="author" content="GiftLocal"/>
+  <link rel="canonical" href="https://giftlocal.vercel.app/"/>
+
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://giftlocal.vercel.app/"/>
+  <meta property="og:title" content="GiftLocal — Find the perfect gift for anyone, anywhere"/>
+  <meta property="og:description" content="AI-powered gift recommendations rooted in their city, culture, and personality. Free, instant, and genuinely thoughtful."/>
+  <meta property="og:image" content="https://giftlocal.vercel.app/og-image.png"/>
+  <meta property="og:site_name" content="GiftLocal"/>
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="GiftLocal — Find the perfect gift for anyone, anywhere"/>
+  <meta name="twitter:description" content="AI-powered gift recommendations rooted in their city, culture, and personality."/>
+  <meta name="twitter:image" content="https://giftlocal.vercel.app/og-image.png"/>
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>"/>
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "GiftLocal",
+    "url": "https://giftlocal.vercel.app",
+    "description": "AI-powered gift recommendations rooted in their city, culture, and personality.",
+    "applicationCategory": "ShoppingApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="src/styles/main.css"/>
+
+  <script>
+    window.GIFTLOCAL_CONFIG = {
+      // Keys are server-side on Vercel. For local dev, uncomment:
+      // groqKey: 'your-key-here',
+      // geminiKey: 'your-key-here',
+      affiliates: {
+        amazon_in: '',     // Amazon India Associates tag (e.g. 'giftlocal-21')
+        amazon_com: '',    // Amazon US Associates tag
+        amazon_uk: '',     // Amazon UK Associates tag
+      }
+    };
+  </script>
+</head>
+<body>
+
+<!-- ── FLOATING DOODLES ─────────────────────────────────────────── -->
+<div class="doodles" aria-hidden="true">
+  <!-- Gift box 1 -->
+  <svg class="doodle doodle-gift1" viewBox="0 0 80 80" fill="none">
+    <rect x="10" y="30" width="60" height="42" rx="6" fill="#FFE4EC" stroke="#FFB5C8" stroke-width="2.5"/>
+    <rect x="10" y="24" width="60" height="14" rx="5" fill="#FFB5C8" stroke="#E8849E" stroke-width="2"/>
+    <rect x="35" y="24" width="10" height="48" rx="2" fill="#E8849E" opacity="0.3"/>
+    <path d="M40 24c-6-10-18-12-16-4s14 4 16 4z" fill="#FFB5C8" stroke="#E8849E" stroke-width="1.5"/>
+    <path d="M40 24c6-10 18-12 16-4s-14 4-16 4z" fill="#FFB5C8" stroke="#E8849E" stroke-width="1.5"/>
+  </svg>
+  <!-- Gift box 2 -->
+  <svg class="doodle doodle-gift2" viewBox="0 0 70 70" fill="none">
+    <rect x="8" y="28" width="54" height="36" rx="5" fill="#EDE7F6" stroke="#C5B4E3" stroke-width="2.5"/>
+    <rect x="8" y="22" width="54" height="12" rx="4" fill="#C5B4E3" stroke="#9B84C9" stroke-width="2"/>
+    <rect x="31" y="22" width="8" height="42" rx="2" fill="#9B84C9" opacity="0.25"/>
+    <path d="M35 22c-5-9-15-10-13-3s11 3 13 3z" fill="#C5B4E3" stroke="#9B84C9" stroke-width="1.5"/>
+    <path d="M35 22c5-9 15-10 13-3s-11 3-13 3z" fill="#C5B4E3" stroke="#9B84C9" stroke-width="1.5"/>
+  </svg>
+  <!-- Bow -->
+  <svg class="doodle doodle-bow" viewBox="0 0 60 40" fill="none">
+    <path d="M30 20c-8-14-26-16-22-4s18 4 22 4z" fill="#FFB5C8" stroke="#E8849E" stroke-width="2"/>
+    <path d="M30 20c8-14 26-16 22-4s-18 4-22 4z" fill="#FFB5C8" stroke="#E8849E" stroke-width="2"/>
+    <circle cx="30" cy="20" r="4" fill="#E8849E"/>
+    <path d="M26 22c2 8 4 14 4 16" stroke="#E8849E" stroke-width="2" stroke-linecap="round"/>
+    <path d="M34 22c-2 8-4 14-4 16" stroke="#E8849E" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+  <!-- Gift bag -->
+  <svg class="doodle doodle-bag" viewBox="0 0 60 70" fill="none">
+    <path d="M10 28h40l-4 38H14z" fill="#D4F5E4" stroke="#A8E6CF" stroke-width="2.5"/>
+    <rect x="10" y="24" width="40" height="8" rx="3" fill="#A8E6CF" stroke="#6CC99F" stroke-width="2"/>
+    <path d="M22 24c0-10 4-16 8-16s8 6 8 16" fill="none" stroke="#6CC99F" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M20 42h20" stroke="#6CC99F" stroke-width="1.5" stroke-dasharray="3 3"/>
+  </svg>
+  <!-- Star sparkle -->
+  <svg class="doodle doodle-sparkle1" viewBox="0 0 30 30" fill="none">
+    <path d="M15 2l2 11 11 2-11 2-2 11-2-11-11-2 11-2z" fill="#FFF5D6" stroke="#F5D870" stroke-width="1.5"/>
+  </svg>
+  <!-- 4-point sparkle -->
+  <svg class="doodle doodle-sparkle2" viewBox="0 0 24 24" fill="none">
+    <path d="M12 0c0 0 2 8 4 10s8 2 8 2-8 0-10 2-2 10-2 10 0-8-2-10S0 12 0 12s8 0 10-2 2-10 2-10z" fill="#FFB5C8" opacity="0.6"/>
+  </svg>
+  <svg class="doodle doodle-sparkle3" viewBox="0 0 24 24" fill="none">
+    <path d="M12 0c0 0 2 8 4 10s8 2 8 2-8 0-10 2-2 10-2 10 0-8-2-10S0 12 0 12s8 0 10-2 2-10 2-10z" fill="#C5B4E3" opacity="0.5"/>
+  </svg>
+  <!-- Heart -->
+  <svg class="doodle doodle-heart1" viewBox="0 0 30 28" fill="none">
+    <path d="M15 26l-1.2-1.1C6.5 18.4 2 14.5 2 9.8 2 6 5 3 8.8 3c2 0 4 .9 5.2 2.4L15 6.6l1-1.2C17.2 3.9 19.2 3 21.2 3 25 3 28 6 28 9.8c0 4.7-4.5 8.6-11.8 15.1L15 26z" fill="#FFB5C8" stroke="#E8849E" stroke-width="1.5"/>
+  </svg>
+  <svg class="doodle doodle-heart2" viewBox="0 0 30 28" fill="none">
+    <path d="M15 26l-1.2-1.1C6.5 18.4 2 14.5 2 9.8 2 6 5 3 8.8 3c2 0 4 .9 5.2 2.4L15 6.6l1-1.2C17.2 3.9 19.2 3 21.2 3 25 3 28 6 28 9.8c0 4.7-4.5 8.6-11.8 15.1L15 26z" fill="#C5B4E3" stroke="#9B84C9" stroke-width="1.5"/>
+  </svg>
+  <!-- Gift tag -->
+  <svg class="doodle doodle-tag" viewBox="0 0 40 50" fill="none">
+    <path d="M6 12L20 2l14 10v28a4 4 0 01-4 4H10a4 4 0 01-4-4z" fill="#FFF5D6" stroke="#F5D870" stroke-width="2"/>
+    <circle cx="20" cy="10" r="3" fill="none" stroke="#F5D870" stroke-width="2"/>
+    <line x1="12" y1="24" x2="28" y2="24" stroke="#F5D870" stroke-width="1.5" stroke-dasharray="3 2"/>
+    <line x1="14" y1="30" x2="26" y2="30" stroke="#F5D870" stroke-width="1.5" stroke-dasharray="3 2"/>
+  </svg>
+  <!-- Confetti pieces -->
+  <div class="doodle doodle-confetti1"></div>
+  <div class="doodle doodle-confetti2"></div>
+  <div class="doodle doodle-confetti3"></div>
+  <div class="doodle doodle-confetti4"></div>
+  <div class="doodle doodle-confetti5"></div>
+  <div class="doodle doodle-confetti6"></div>
+</div>
+
+<!-- ── NAV ────────────────────────────────────────────────────── -->
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <span class="logo-icon">🎁</span>
+    gift<span class="accent">local</span>
+  </a>
+  <a href="mailto:povaiuser@yahoo.com" class="nav-list-link">List your experience ✨</a>
+</nav>
+
+<!-- ── HERO ───────────────────────────────────────────────────── -->
+<div class="page-center">
+  <section class="hero">
+    <!-- Hero gift illustration -->
+    <div class="hero-illustration" aria-hidden="true">
+      <svg viewBox="0 0 300 200" fill="none" class="hero-gifts-svg">
+        <!-- Big gift box -->
+        <rect x="95" y="80" width="110" height="90" rx="10" fill="#FFE4EC" stroke="#FFB5C8" stroke-width="3"/>
+        <rect x="95" y="68" width="110" height="22" rx="8" fill="#FFB5C8" stroke="#E8849E" stroke-width="2.5"/>
+        <rect x="142" y="68" width="16" height="102" rx="3" fill="#E8849E" opacity="0.25"/>
+        <!-- Big bow -->
+        <path d="M150 68c-12-20-38-24-32-8s26 8 32 8z" fill="#FFB5C8" stroke="#E8849E" stroke-width="2"/>
+        <path d="M150 68c12-20 38-24 32-8s-26 8-32 8z" fill="#FFB5C8" stroke="#E8849E" stroke-width="2"/>
+        <circle cx="150" cy="68" r="6" fill="#E8849E"/>
+        <path d="M144 72c3 8 4 14 6 18" stroke="#E8849E" stroke-width="2" stroke-linecap="round"/>
+        <path d="M156 72c-3 8-4 14-6 18" stroke="#E8849E" stroke-width="2" stroke-linecap="round"/>
+        <!-- Small gift left -->
+        <rect x="30" y="120" width="60" height="50" rx="8" fill="#EDE7F6" stroke="#C5B4E3" stroke-width="2.5"/>
+        <rect x="30" y="112" width="60" height="14" rx="5" fill="#C5B4E3" stroke="#9B84C9" stroke-width="2"/>
+        <rect x="55" y="112" width="10" height="58" rx="2" fill="#9B84C9" opacity="0.2"/>
+        <path d="M60 112c-5-9-16-11-14-3s12 3 14 3z" fill="#C5B4E3" stroke="#9B84C9" stroke-width="1.5"/>
+        <path d="M60 112c5-9 16-11 14-3s-12 3-14 3z" fill="#C5B4E3" stroke="#9B84C9" stroke-width="1.5"/>
+        <!-- Small gift right -->
+        <rect x="215" y="110" width="55" height="60" rx="8" fill="#D4F5E4" stroke="#A8E6CF" stroke-width="2.5"/>
+        <rect x="215" y="102" width="55" height="14" rx="5" fill="#A8E6CF" stroke="#6CC99F" stroke-width="2"/>
+        <rect x="237" y="102" width="10" height="68" rx="2" fill="#6CC99F" opacity="0.2"/>
+        <path d="M242 102c-4-8-14-10-12-3s10 3 12 3z" fill="#A8E6CF" stroke="#6CC99F" stroke-width="1.5"/>
+        <path d="M242 102c4-8 14-10 12-3s-10 3-12 3z" fill="#A8E6CF" stroke="#6CC99F" stroke-width="1.5"/>
+        <!-- Sparkles -->
+        <path d="M45 100l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" fill="#F5D870"/>
+        <path d="M255 90l1.5 4.5 4.5 1.5-4.5 1.5-1.5 4.5-1.5-4.5-4.5-1.5 4.5-1.5z" fill="#FFB5C8"/>
+        <path d="M180 45l1.5 4.5 4.5 1.5-4.5 1.5-1.5 4.5-1.5-4.5-4.5-1.5 4.5-1.5z" fill="#C5B4E3"/>
+        <path d="M120 42l1 3 3 1-3 1-1 3-1-3-3-1 3-1z" fill="#A8E6CF"/>
+        <!-- Hearts -->
+        <path d="M75 95c0-3 2-5 4.5-5s4.5 2 4.5 5c0 4-4.5 7-4.5 7s-4.5-3-4.5-7z" fill="#FFB5C8" opacity="0.6"/>
+        <path d="M225 82c0-2.5 1.8-4 3.8-4s3.8 1.5 3.8 4c0 3.5-3.8 6-3.8 6s-3.8-2.5-3.8-6z" fill="#C5B4E3" opacity="0.5"/>
+        <!-- Confetti dots -->
+        <circle cx="35" cy="85" r="3" fill="#A8E6CF" opacity="0.5"/>
+        <circle cx="268" cy="140" r="2.5" fill="#FFB5C8" opacity="0.5"/>
+        <circle cx="25" cy="150" r="2" fill="#F5D870" opacity="0.6"/>
+        <circle cx="280" cy="105" r="2" fill="#C5B4E3" opacity="0.6"/>
+        <rect x="12" y="130" width="5" height="5" rx="1" fill="#FFB5C8" opacity="0.4" transform="rotate(30 14 132)"/>
+        <rect x="275" cy="125" width="4" height="4" rx="1" fill="#A8E6CF" opacity="0.4" transform="rotate(45 277 127)"/>
+      </svg>
+    </div>
+
+    <div class="hero-eyebrow">~ AI-powered · location-aware · free to use ~</div>
+    <h1>find the <em>perfect gift</em> for anyone, anywhere!</h1>
+    <p class="hero-sub">tell us who you're buying for and where they live — we'll find gifts rooted in their city, culture &amp; season ♡</p>
+  </section>
+
+  <!-- Feature pills -->
+  <div class="features">
+    <div class="feature">📍 Rooted in their city</div>
+    <div class="feature">🔍 Live web search</div>
+    <div class="feature">💝 Genuinely thoughtful</div>
+    <div class="feature">⚡ Ready in 30 seconds</div>
+  </div>
+
+  <!-- Scalloped divider -->
+  <div class="scallop-divider" aria-hidden="true">
+    <svg viewBox="0 0 1200 40" preserveAspectRatio="none">
+      <path d="M0,40 C30,40 30,10 60,10 C90,10 90,40 120,40 C150,40 150,10 180,10 C210,10 210,40 240,40 C270,40 270,10 300,10 C330,10 330,40 360,40 C390,40 390,10 420,10 C450,10 450,40 480,40 C510,40 510,10 540,10 C570,10 570,40 600,40 C630,40 630,10 660,10 C690,10 690,40 720,40 C750,40 750,10 780,10 C810,10 810,40 840,40 C870,40 870,10 900,10 C930,10 930,40 960,40 C990,40 990,10 1020,10 C1050,10 1050,40 1080,40 C1110,40 1110,10 1140,10 C1170,10 1170,40 1200,40 L1200,40 L0,40 Z" fill="var(--pink-light)"/>
+    </svg>
+  </div>
+
+  <!-- ── FORM ─────────────────────────────────────────────────── -->
+  <div class="form-card" id="form-section">
+    <h2 class="form-title">tell us about them! </h2>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="occasion">occasion</label>
+        <select id="occasion">
+          <option value="">pick one ~</option>
+          <option>Birthday</option>
+          <option>Anniversary</option>
+          <option>New job / promotion</option>
+          <option>Housewarming</option>
+          <option>Wedding</option>
+          <option>Graduation</option>
+          <option>Holiday / Christmas</option>
+          <option>Just because</option>
+          <option>Thank you</option>
+          <option>New baby</option>
+          <option>Retirement</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="age">their age</label>
+        <input type="number" id="age" placeholder="e.g. 32" min="1" max="110"/>
+      </div>
+
+      <div class="form-group">
+        <label for="relationship">your relationship</label>
+        <select id="relationship">
+          <option value="">who are they? ~</option>
+          <option>Best friend</option>
+          <option>Partner / spouse</option>
+          <option>Parent</option>
+          <option>Sibling</option>
+          <option>Colleague</option>
+          <option>Boss / mentor</option>
+          <option>Child</option>
+          <option>Grandparent</option>
+          <option>Friend</option>
+          <option>Acquaintance</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="budget">budget</label>
+        <div class="budget-row">
+          <select id="currency" class="budget-currency">
+            <option value="$">$ USD</option>
+            <option value="£">£ GBP</option>
+            <option value="€">€ EUR</option>
+            <option value="₹">₹ INR</option>
+          </select>
+          <input type="text" id="budget" placeholder="e.g. 2000–5000"/>
+        </div>
+      </div>
+
+      <div class="form-group full">
+        <label for="location">their city &amp; country</label>
+        <div class="location-wrap">
+          <input type="text" id="location" placeholder="start typing a city…" autocomplete="off"/>
+          <div class="location-suggestions" id="location-suggestions"></div>
+        </div>
+      </div>
+
+      <div class="form-group full">
+        <label>their interests <span class="label-hint">(pick at least 1, up to 5)</span></label>
+        <div class="interest-grid" id="interest-grid">
+          <button type="button" class="interest-tag" data-value="foodie">🍳 Foodie</button>
+          <button type="button" class="interest-tag" data-value="outdoorsy">🏔️ Outdoorsy</button>
+          <button type="button" class="interest-tag" data-value="bookish">📚 Bookish</button>
+          <button type="button" class="interest-tag" data-value="creative">🎨 Creative</button>
+          <button type="button" class="interest-tag" data-value="music">🎵 Music lover</button>
+          <button type="button" class="interest-tag" data-value="minimalist">✨ Minimalist</button>
+          <button type="button" class="interest-tag" data-value="tech">💻 Tech</button>
+          <button type="button" class="interest-tag" data-value="wellness">🧘 Wellness</button>
+          <button type="button" class="interest-tag" data-value="travel">✈️ Travel</button>
+          <button type="button" class="interest-tag" data-value="gardening">🌱 Gardening</button>
+          <button type="button" class="interest-tag" data-value="coffee">☕ Coffee & tea</button>
+          <button type="button" class="interest-tag" data-value="fashion">👗 Fashion</button>
+          <button type="button" class="interest-tag" data-value="sports">⚽ Sports & fitness</button>
+          <button type="button" class="interest-tag" data-value="gaming">🎮 Gaming</button>
+          <button type="button" class="interest-tag" data-value="photography">📷 Photography</button>
+          <button type="button" class="interest-tag" data-value="home-decor">🏡 Home & decor</button>
+          <button type="button" class="interest-tag" data-value="wine-spirits">🍷 Wine & spirits</button>
+          <button type="button" class="interest-tag" data-value="pets">🐾 Pet lover</button>
+          <button type="button" class="interest-tag" data-value="crafty">🧶 Crafty / DIY</button>
+          <button type="button" class="interest-tag" data-value="film">🎬 Film & TV</button>
+        </div>
+        <div class="custom-interest-row">
+          <input type="text" id="pill-input" placeholder="+ add your own…" maxlength="30" autocomplete="off"/>
+        </div>
+      </div>
+
+      <div class="form-group full">
+        <label for="extra">anything else? <span class="label-hint">(optional)</span></label>
+        <textarea id="extra" placeholder="e.g. she just moved · hates clutter · recently got into ceramics…"></textarea>
+      </div>
+    </div>
+
+    <div class="error-box" id="error-box"></div>
+
+    <button class="btn-submit" id="submit-btn">
+      ✨ find their perfect gift!
+    </button>
+  </div>
+
+  <!-- ── LOADING ───────────────────────────────────────────────── -->
+  <div class="loading" id="loading">
+    <div class="loading-dots"><span></span><span></span><span></span></div>
+    <p class="loading-phrase" id="loading-phrase">thinking about their city…</p>
+  </div>
+
+  <!-- ── RESULTS ───────────────────────────────────────────────── -->
+  <div class="results" id="results">
+
+    <!-- Scalloped top -->
+    <div class="scallop-divider scallop-results" aria-hidden="true">
+      <svg viewBox="0 0 1200 40" preserveAspectRatio="none">
+        <path d="M0,40 C30,40 30,10 60,10 C90,10 90,40 120,40 C150,40 150,10 180,10 C210,10 210,40 240,40 C270,40 270,10 300,10 C330,10 330,40 360,40 C390,40 390,10 420,10 C450,10 450,40 480,40 C510,40 510,10 540,10 C570,10 570,40 600,40 C630,40 630,10 660,10 C690,10 690,40 720,40 C750,40 750,10 780,10 C810,10 810,40 840,40 C870,40 870,10 900,10 C930,10 930,40 960,40 C990,40 990,10 1020,10 C1050,10 1050,40 1080,40 C1110,40 1110,10 1140,10 C1170,10 1170,40 1200,40 L1200,40 L0,40 Z" fill="var(--lavender-light)"/>
+      </svg>
+    </div>
+
+    <div class="results-header">
+      <h2 id="results-title">your gift ideas! 🎁</h2>
+      <p id="results-sub"></p>
+      <div class="results-actions">
+        <button class="btn-edit-choices" id="edit-choices-btn">✏️ edit choices</button>
+        <button class="btn-regenerate" id="regenerate-btn">🔄 regenerate</button>
+      </div>
+    </div>
+
+    <!-- ── EDITABLE SUMMARY BAR ──────────────────────────────── -->
+    <div class="summary-bar" id="summary-bar"></div>
+
+    <div class="refine-inline" id="refine-inline">
+      <input type="text" class="refine-input" id="refine-input"
+        placeholder="not quite right? e.g. she has social anxiety · no group activities · more cozy stuff…"/>
+      <button class="refine-btn" id="refine-btn">refine ✨</button>
+    </div>
+
+    <div class="category-tabs" id="category-tabs">
+      <button class="cat-tab active" data-category="all">🌟 All</button>
+      <button class="cat-tab" data-category="Experience">🎟️ Experiences</button>
+      <button class="cat-tab" data-category="Local craft">🎨 Crafts</button>
+      <button class="cat-tab" data-category="Food & drink">🍽️ Food</button>
+      <button class="cat-tab" data-category="Physical gift">🎁 Gifts</button>
+      <button class="cat-tab" data-category="Subscription">📦 Subs</button>
+    </div>
+
+    <div id="gift-cards-container"></div>
+
+    <div class="star-pick" id="star-pick" style="display:none">
+      <div class="star-label">⭐ the one that will surprise them most!</div>
+      <p class="star-text" id="star-pick-text"></p>
+    </div>
+
+    <button class="btn-start-over" id="start-over-btn">← start a new search</button>
+  </div>
+</div><!-- /page-center -->
+
+<!-- ── CONTACT ────────────────────────────────────────────────── -->
+<section class="contact-section" id="contact">
+  <div class="contact-card">
+    <h2 class="contact-title">got feedback? say hi! 💌</h2>
+    <p class="contact-sub">found a bug, have a suggestion, or just want to chat? we'd love to hear from you~</p>
+    <form class="contact-form" id="contact-form" onsubmit="
+      event.preventDefault();
+      const name = this.querySelector('#contact-name').value.trim();
+      const email = this.querySelector('#contact-email').value.trim();
+      const msg = this.querySelector('#contact-msg').value.trim();
+      if (!name || !email || !msg) return;
+      const subject = encodeURIComponent('GiftLocal Feedback from ' + name);
+      const body = encodeURIComponent('From: ' + name + ' (' + email + ')\n\n' + msg);
+      window.open('mailto:povaiuser@yahoo.com?subject=' + subject + '&body=' + body);
+      this.reset();
+      document.getElementById('contact-success').style.display = 'block';
+      setTimeout(() => { document.getElementById('contact-success').style.display = 'none'; }, 3000);
+    ">
+      <div class="contact-row">
+        <div class="contact-field">
+          <label for="contact-name">your name</label>
+          <input type="text" id="contact-name" placeholder="e.g. Priya" required/>
+        </div>
+        <div class="contact-field">
+          <label for="contact-email">your email</label>
+          <input type="email" id="contact-email" placeholder="e.g. priya@email.com" required/>
+        </div>
+      </div>
+      <div class="contact-field">
+        <label for="contact-msg">your message</label>
+        <textarea id="contact-msg" rows="4" placeholder="tell us what's on your mind~" required></textarea>
+      </div>
+      <button type="submit" class="contact-submit">send message ✨</button>
+      <p class="contact-success" id="contact-success" style="display:none">thanks for reaching out! opening your email app~ 💌</p>
+    </form>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="scallop-divider scallop-footer" aria-hidden="true">
+    <svg viewBox="0 0 1200 40" preserveAspectRatio="none">
+      <path d="M0,0 C30,0 30,30 60,30 C90,30 90,0 120,0 C150,0 150,30 180,30 C210,30 210,0 240,0 C270,0 270,30 300,30 C330,30 330,0 360,0 C390,0 390,30 420,30 C450,30 450,0 480,0 C510,0 510,30 540,30 C570,30 570,0 600,0 C630,0 630,30 660,30 C690,30 690,0 720,0 C750,0 750,30 780,30 C810,30 810,0 840,0 C870,0 870,30 900,30 C930,30 930,0 960,0 C990,0 990,30 1020,30 C1050,30 1050,0 1080,0 C1110,0 1110,30 1140,30 C1170,30 1170,0 1200,0 L1200,40 L0,40 Z" fill="var(--periwinkle)"/>
+    </svg>
+  </div>
+  <div class="footer-inner">
+    made with ♡ ·
+    <a href="mailto:povaiuser@yahoo.com">list your experience</a> ·
+  </div>
+</footer>
+
+<!-- ── SCRIPTS ─────────────────────────────────────────────────── -->
+<script type="module">
+import { SYSTEM_PROMPT, buildUserMessage, buildRefinementMessage } from './src/lib/prompt.js';
+import { getGroqSuggestions } from './src/lib/groq.js';
+import { getGeminiSuggestions } from './src/lib/gemini.js';
+import { getGiftSuggestions } from './src/lib/api.js';
+import { getLocalRecommendations } from './src/lib/gifts.js';
+import { initForm, validateForm, getFormData, getApiKey, getGeminiKey, promptForApiKey, setFormData } from './src/components/form.js';
+import { renderResults } from './src/components/results.js';
+
+// ── Init form ───────────────────────────────────────────────────
+initForm();
+
+// ── State ───────────────────────────────────────────────────────
+let conversationHistory = [];
+let lastFormData = null;
+
+// ── Loading phrases ─────────────────────────────────────────────
+const PHRASES = [
+  'thinking about their city…',
+  'reading the cultural signals…',
+  'searching for local experiences…',
+  'filtering out the generic stuff…',
+  'finding what will actually land…',
+  'almost there — making it personal…',
+];
+let phraseTimer;
+function startPhrases() {
+  let i = 0;
+  const el = document.getElementById('loading-phrase');
+  el.textContent = PHRASES[0];
+  phraseTimer = setInterval(() => {
+    i = (i + 1) % PHRASES.length;
+    el.textContent = PHRASES[i];
+  }, 2400);
+}
+function stopPhrases() { clearInterval(phraseTimer); }
+
+// ── UI helpers (page transitions) ────────────────────────────────
+const formEl = document.getElementById('form-section');
+const resultsEl = document.getElementById('results');
+
+function hideForm() {
+  formEl.classList.add('hiding');
+  setTimeout(() => { formEl.style.display = 'none'; }, 350);
+}
+function showForm() {
+  formEl.style.display = 'block';
+  formEl.classList.remove('hiding');
+}
+function showLoading()  { document.getElementById('loading').classList.add('show'); }
+function hideLoading()  { document.getElementById('loading').classList.remove('show'); }
+
+let hideResultsTimer = null;
+function showResults() {
+  if (hideResultsTimer) { clearTimeout(hideResultsTimer); hideResultsTimer = null; }
+  resultsEl.style.display = 'block';
+  resultsEl.offsetHeight; // force reflow
+  resultsEl.classList.add('show');
+}
+function hideResults() {
+  resultsEl.classList.remove('show');
+  hideResultsTimer = setTimeout(() => { resultsEl.style.display = 'none'; }, 400);
+}
+function showError(msg) {
+  const box = document.getElementById('error-box');
+  box.textContent = msg;
+  box.classList.add('show');
+}
+function hideError()    { document.getElementById('error-box').classList.remove('show'); }
+
+// ── Summary bar ─────────────────────────────────────────────────
+function buildSummaryBar(formData) {
+  const bar = document.getElementById('summary-bar');
+  if (!formData) { bar.classList.remove('show'); return; }
+
+  const interests = formData.personality ? formData.personality.split(', ').filter(Boolean) : [];
+  const interestPills = interests.map(i =>
+    `<span class="summary-interest-pill">${escapeHtml(i)}</span>`
+  ).join('');
+
+  bar.innerHTML = `
+    <div class="summary-chips">
+      <div class="summary-chip" data-field="occasion">
+        <span class="chip-icon">🎂</span>${escapeHtml(formData.occasion)}
+      </div>
+      <div class="summary-chip" data-field="age">
+        <span class="chip-icon">👤</span>Age ${escapeHtml(formData.age)}
+      </div>
+      <div class="summary-chip" data-field="relationship">
+        <span class="chip-icon">💝</span>${escapeHtml(formData.relationship)}
+      </div>
+      <div class="summary-chip" data-field="currency">
+        <span class="chip-icon">💱</span>${escapeHtml(formData.currency)}
+      </div>
+      <div class="summary-chip" data-field="budget">
+        <span class="chip-icon">💰</span>${escapeHtml(formData.budget)}
+      </div>
+      <div class="summary-chip" data-field="location">
+        <span class="chip-icon">📍</span>${escapeHtml(formData.location)}
+      </div>
+      <div class="summary-chip summary-chip--interests" data-field="interests">
+        <div class="summary-interests">${interestPills}</div>
+      </div>
+      <button class="btn-update-results" id="update-results-btn" style="display:none;">
+        🔄 update results
+      </button>
+    </div>
+  `;
+  bar.classList.add('show');
+
+  bar.querySelectorAll('.summary-chip[data-field]').forEach(chip => {
+    const field = chip.dataset.field;
+    if (field === 'interests') return;
+    chip.addEventListener('click', () => startChipEdit(chip, field, formData));
+  });
+
+  document.getElementById('update-results-btn').addEventListener('click', () => {
+    applyChipEditsToForm();
+    document.getElementById('update-results-btn').style.display = 'none';
+    document.getElementById('submit-btn').click();
+  });
+}
+
+let chipEdits = {};
+
+function startChipEdit(chip, field, formData) {
+  if (chip.classList.contains('editing')) return;
+  chip.classList.add('editing');
+
+  const currentValue = chipEdits[field] || formData[field] || '';
+  let editEl;
+
+  if (field === 'currency') {
+    editEl = document.createElement('select');
+    editEl.className = 'chip-edit-select';
+    [['$', '$ USD'], ['£', '£ GBP'], ['€', '€ EUR'], ['₹', '₹ INR']].forEach(([val, label]) => {
+      const o = document.createElement('option');
+      o.value = val;
+      o.textContent = label;
+      if (val === currentValue) o.selected = true;
+      editEl.appendChild(o);
+    });
+  } else if (field === 'occasion' || field === 'relationship') {
+    const sourceSelect = document.getElementById(field);
+    editEl = document.createElement('select');
+    editEl.className = 'chip-edit-select';
+    Array.from(sourceSelect.options).forEach(opt => {
+      if (!opt.value) return;
+      const o = document.createElement('option');
+      o.value = opt.value;
+      o.textContent = opt.textContent;
+      if (opt.value === currentValue) o.selected = true;
+      editEl.appendChild(o);
+    });
+  } else {
+    editEl = document.createElement('input');
+    editEl.className = 'chip-edit-input';
+    editEl.type = field === 'age' ? 'number' : 'text';
+    editEl.value = currentValue;
+    if (field === 'age') { editEl.min = '1'; editEl.max = '120'; editEl.style.width = '50px'; }
+    if (field === 'budget') { editEl.style.width = '90px'; }
+    if (field === 'location') { editEl.style.width = '160px'; }
+  }
+
+  const icon = chip.querySelector('.chip-icon');
+  chip.innerHTML = '';
+  if (icon) chip.appendChild(icon);
+  chip.appendChild(editEl);
+  editEl.focus();
+
+  const finishEdit = () => {
+    const newVal = editEl.value.trim();
+    if (newVal) chipEdits[field] = newVal;
+    chip.classList.remove('editing');
+    const icons = { occasion: '🎂', age: '👤', relationship: '💝', currency: '💱', budget: '💰', location: '📍' };
+    const prefix = field === 'age' ? 'Age ' : '';
+    chip.innerHTML = `<span class="chip-icon">${icons[field]}</span>${prefix}${escapeHtml(newVal || currentValue)}`;
+    document.getElementById('update-results-btn').style.display = '';
+  };
+
+  editEl.addEventListener('blur', finishEdit);
+  editEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); editEl.blur(); }
+    if (e.key === 'Escape') { editEl.value = currentValue; editEl.blur(); }
+  });
+}
+
+function applyChipEditsToForm() {
+  Object.entries(chipEdits).forEach(([field, value]) => {
+    if (field === 'occasion' || field === 'relationship') {
+      document.getElementById(field).value = value;
+    } else if (field === 'currency') {
+      document.getElementById('currency').value = value;
+    } else if (field === 'age') {
+      document.getElementById('age').value = value;
+    } else if (field === 'budget') {
+      document.getElementById('budget').value = value.replace(/^[^0-9]*/, '');
+    } else if (field === 'location') {
+      document.getElementById('location').value = value;
+    }
+  });
+  chipEdits = {};
+}
+
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ── Category tabs ──────────────────────────────────────────────
+document.getElementById('category-tabs').addEventListener('click', (e) => {
+  const tab = e.target.closest('.cat-tab');
+  if (!tab) return;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  const category = tab.dataset.category;
+  document.querySelectorAll('.gift-card').forEach(card => {
+    if (category === 'all' || card.dataset.type === category) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+});
+
+// ── Submit ──────────────────────────────────────────────────────
+document.getElementById('submit-btn').addEventListener('click', async () => {
+  hideError();
+
+  const { valid, error } = validateForm();
+  if (!valid) { showError(error); return; }
+
+  lastFormData = getFormData();
+
+  // Priority: Groq (free) → Gemini (free) → Anthropic (paid) → Local static (fallback)
+  const groqKey = window.GIFTLOCAL_CONFIG?.groqKey;
+  const geminiKey = getGeminiKey();
+  const anthropicKey = getApiKey();
+
+  if (groqKey) {
+    conversationHistory = [{ role: 'user', content: buildUserMessage(lastFormData) }];
+    await runRequest('groq', groqKey);
+    return;
+  }
+
+  if (geminiKey) {
+    conversationHistory = [{ role: 'user', content: buildUserMessage(lastFormData) }];
+    await runRequest('gemini', geminiKey);
+    return;
+  }
+
+  if (anthropicKey && anthropicKey !== 'YOUR_API_KEY_HERE') {
+    conversationHistory = [{ role: 'user', content: buildUserMessage(lastFormData) }];
+    await runRequest('anthropic', anthropicKey);
+    return;
+  }
+
+  // Fallback: local static recommendations
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  hideForm();
+  showLoading();
+  startPhrases();
+
+  await new Promise(r => setTimeout(r, 1200));
+
+  const parsed = getLocalRecommendations(lastFormData);
+  const rawText = JSON.stringify(parsed);
+  renderResults(parsed, rawText, lastFormData);
+  buildSummaryBar(lastFormData);
+  stopPhrases();
+  hideLoading();
+  showResults();
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  btn.disabled = false;
+});
+
+// ── Refine ──────────────────────────────────────────────────────
+async function handleRefine() {
+  const feedback = document.getElementById('refine-input').value.trim();
+  if (!feedback) return;
+
+  const groqKey = window.GIFTLOCAL_CONFIG?.groqKey;
+  const geminiKey = getGeminiKey();
+  const anthropicKey = getApiKey();
+
+  if (!groqKey && !geminiKey && (!anthropicKey || anthropicKey === 'YOUR_API_KEY_HERE')) {
+    if (!lastFormData) return;
+
+    // Append the feedback into the extra context so the engine uses it
+    lastFormData.extra = (lastFormData.extra || '') + ' ' + feedback;
+    // Also update the actual form field
+    const extraEl = document.getElementById('extra');
+    if (extraEl) extraEl.value = lastFormData.extra.trim();
+
+    showLoading();
+    startPhrases();
+    await new Promise(r => setTimeout(r, 800));
+
+    const parsed = getLocalRecommendations(lastFormData);
+    const rawText = JSON.stringify(parsed);
+    renderResults(parsed, rawText, lastFormData);
+    buildSummaryBar(lastFormData);
+    stopPhrases();
+    hideLoading();
+    document.getElementById('refine-input').value = '';
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+
+  const rawText = document.getElementById('gift-cards-container').getAttribute('data-raw') || '';
+  conversationHistory.push({ role: 'assistant', content: rawText });
+  conversationHistory.push({ role: 'user', content: buildRefinementMessage(feedback) });
+
+  document.getElementById('refine-input').value = '';
+  const provider = groqKey ? 'groq' : geminiKey ? 'gemini' : 'anthropic';
+  const key = groqKey || geminiKey || anthropicKey;
+  await runRequest(provider, key);
+}
+document.getElementById('refine-btn').addEventListener('click', handleRefine);
+document.getElementById('refine-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); handleRefine(); }
+});
+
+// ── Edit choices ────────────────────────────────────────────────
+document.getElementById('edit-choices-btn').addEventListener('click', () => {
+  hideResults();
+  showForm();
+  document.getElementById('form-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+// ── Regenerate ──────────────────────────────────────────────────
+document.getElementById('regenerate-btn').addEventListener('click', () => {
+  document.getElementById('submit-btn').click();
+});
+
+// ── Start over ──────────────────────────────────────────────────
+document.getElementById('start-over-btn').addEventListener('click', () => {
+  hideResults();
+  showForm();
+  document.getElementById('summary-bar').classList.remove('show');
+  document.querySelectorAll('.interest-tag.selected').forEach(t => t.classList.remove('selected'));
+  const customPills = document.getElementById('custom-pills');
+  if (customPills) customPills.innerHTML = '';
+  conversationHistory = [];
+  chipEdits = {};
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ── Core request ────────────────────────────────────────────────
+async function runRequest(provider, apiKey) {
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  hideForm();
+  hideResults();
+  showLoading();
+  startPhrases();
+
+  try {
+    let result;
+    if (provider === 'groq') {
+      result = await getGroqSuggestions(apiKey, conversationHistory, SYSTEM_PROMPT);
+    } else if (provider === 'gemini') {
+      result = await getGeminiSuggestions(apiKey, conversationHistory, SYSTEM_PROMPT);
+    } else {
+      result = await getGiftSuggestions(apiKey, conversationHistory, SYSTEM_PROMPT);
+    }
+    const { rawText, parsed } = result;
+    renderResults(parsed, rawText, lastFormData);
+    buildSummaryBar(lastFormData);
+    showResults();
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (err) {
+    // API failed — fall back to local recommendations silently
+    console.warn('API error, falling back to local:', err.message);
+    try {
+      const parsed = getLocalRecommendations(lastFormData);
+      const rawText = JSON.stringify(parsed);
+      renderResults(parsed, rawText, lastFormData);
+      buildSummaryBar(lastFormData);
+      showResults();
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (fallbackErr) {
+      // Even local failed — show form with error
+      console.error('Fallback also failed:', fallbackErr);
+      showForm();
+      showError('Something went wrong. Please try again.');
+    }
+  } finally {
+    stopPhrases();
+    hideLoading();
+    btn.disabled = false;
+  }
+}
+</script>
+
+</body>
+</html>
