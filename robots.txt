@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://giftlocal.vercel.app/sitemap.xml
