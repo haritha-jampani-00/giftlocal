@@ -57,14 +57,19 @@
       // Keys are server-side on Vercel. For local dev, uncomment:
       // groqKey: 'your-key-here',
       // geminiKey: 'your-key-here',
+      // Supabase (safe to expose — anon key is public)
+      supabaseUrl: 'https://aizcnsrvzvofzqosqqcz.supabase.co',
+      supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpemNuc3J2enZvZnpxb3NxcWN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyODM3MjYsImV4cCI6MjA4OTg1OTcyNn0.LVCEp1ULiprRKVrdIpqxdhrHZI98MjXRIum3w3Bj9H4',
       affiliates: {
-        amazon_in: '',     // Amazon India Associates tag (e.g. 'giftlocal-21')
-        amazon_com: '',    // Amazon US Associates tag
-        amazon_uk: '',     // Amazon UK Associates tag
+        amazon_in: '',
+        amazon_com: '',
+        amazon_uk: '',
       }
     };
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 <body>
 
@@ -141,8 +146,39 @@
     <span class="logo-icon">🎁</span>
     gift<span class="accent">local</span>
   </a>
-  <a href="mailto:povaiuser@yahoo.com" class="nav-list-link">List your experience ✨</a>
+  <div class="nav-right">
+    <button class="nav-sign-in" id="sign-in-btn">sign in ✨</button>
+    <button class="nav-profile" id="profile-btn" style="display:none">
+      <img class="profile-avatar" id="profile-avatar" alt="avatar" style="display:none"/>
+      <span class="profile-name" id="profile-name"></span>
+      <span class="profile-arrow">▾</span>
+    </button>
+    <div class="profile-dropdown" id="profile-dropdown">
+      <button class="dropdown-item" id="my-searches-btn">📋 my searches</button>
+      <button class="dropdown-item" id="my-wishlist-btn">♥ wishlist</button>
+      <hr class="dropdown-divider"/>
+      <button class="dropdown-item" id="sign-out-btn">sign out</button>
+    </div>
+  </div>
 </nav>
+
+<!-- ── AUTH MODAL ─────────────────────────────────────────────── -->
+<div class="auth-modal-backdrop" id="auth-modal" hidden>
+  <div class="auth-modal">
+    <button class="auth-close" id="auth-close">×</button>
+    <h2 class="auth-title" id="auth-title">welcome back ✨</h2>
+    <p class="auth-subtitle">sign in to save searches, create wishlists & share results</p>
+
+    <form class="auth-email-form" id="auth-email-form">
+      <input type="email" id="auth-email" placeholder="email" required/>
+      <input type="password" id="auth-password" placeholder="password (min 6 chars)" required minlength="6"/>
+      <button type="submit" class="auth-submit-btn" id="auth-submit-btn">sign in</button>
+    </form>
+
+    <p class="auth-error" id="auth-error" hidden></p>
+    <a href="#" class="auth-toggle" id="auth-toggle">no account? create one</a>
+  </div>
+</div>
 
 <!-- ── HERO ───────────────────────────────────────────────────── -->
 <div class="page-center">
@@ -248,7 +284,7 @@
       <div class="form-group">
         <label for="age">their age</label>
         <div class="age-input-wrap">
-          <input type="number" id="age" placeholder="e.g. 32" min="0" max="110"/>
+          <input type="number" id="age" placeholder="e.g. 32" min="0" max="110" autocomplete="off"/>
           <select id="age-unit" class="age-unit-select">
             <option value="years">years</option>
             <option value="months">months</option>
@@ -292,7 +328,7 @@
             <option value="€">€ EUR</option>
             <option value="₹">₹ INR</option>
           </select>
-          <input type="text" id="budget" placeholder="e.g. 2000–5000"/>
+          <input type="text" id="budget" placeholder="e.g. 2000–5000" autocomplete="off"/>
         </div>
       </div>
 
@@ -368,6 +404,7 @@
       <div class="results-actions">
         <button class="btn-edit-choices" id="edit-choices-btn">✏️ edit choices</button>
         <button class="btn-regenerate" id="regenerate-btn">🔄 regenerate</button>
+        <button class="btn-save-search" id="save-search-btn">💾 save search</button>
       </div>
     </div>
 
@@ -460,14 +497,26 @@ import { getGeminiSuggestions } from './src/lib/gemini.js';
 import { getGiftSuggestions } from './src/lib/api.js';
 import { getLocalRecommendations } from './src/lib/gifts.js';
 import { initForm, validateForm, getFormData, getApiKey, getGeminiKey, promptForApiKey, setFormData } from './src/components/form.js';
-import { renderResults } from './src/components/results.js';
+import { renderResults } from './src/components/results.js?v=3';
+import { initAuth, isLoggedIn } from './src/components/auth.js';
+import { initProfile } from './src/components/profile.js';
+import { canSearch, incrementGuestSearch, getRemainingSearches, getSearchLimit, saveSearch } from './src/lib/supabase.js';
 
-// ── Init form ───────────────────────────────────────────────────
+// ── Init ────────────────────────────────────────────────────────
 initForm();
+initAuth();
+initProfile();
 
 // ── State ───────────────────────────────────────────────────────
 let conversationHistory = [];
 let lastFormData = null;
+
+// ── Session persistence ─────────────────────────────────────────
+function saveToSession(parsed, rawText, formData) {
+  try {
+    sessionStorage.setItem('giftlocal_last_results', JSON.stringify({ parsed, rawText, formData }));
+  } catch (e) { /* ignore */ }
+}
 
 // ── Loading phrases ─────────────────────────────────────────────
 const PHRASES = [
@@ -690,6 +739,20 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
 
   lastFormData = getFormData();
 
+  // Check AI search limit (local results are always unlimited)
+  const loggedIn = isLoggedIn();
+  if (!canSearch(loggedIn)) {
+    const limit = getSearchLimit(loggedIn);
+    if (!loggedIn) {
+      showError(`You've used all ${limit} free AI searches today. Sign in for more, or try again tomorrow! Local results still work.`);
+      // Show auth modal as a nudge
+      document.getElementById('auth-modal').hidden = false;
+    } else {
+      showError(`You've used all ${limit} AI searches today. Come back tomorrow! Local results still work.`);
+    }
+    // Fall through to local results below
+  }
+
   // Priority: Groq (free) → Gemini (free) → Anthropic (paid) → Local static (fallback)
   const groqKey = window.GIFTLOCAL_CONFIG?.groqKey;
   const geminiKey = getGeminiKey();
@@ -726,6 +789,7 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
   const rawText = JSON.stringify(parsed);
   renderResults(parsed, rawText, lastFormData);
   buildSummaryBar(lastFormData);
+  saveToSession(parsed, rawText, lastFormData);
   stopPhrases();
   hideLoading();
   showResults();
@@ -780,6 +844,41 @@ document.getElementById('refine-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') { e.preventDefault(); handleRefine(); }
 });
 
+// ── Save search ─────────────────────────────────────────────────
+document.getElementById('save-search-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('save-search-btn');
+  if (!lastFormData) return;
+
+  const { getUser } = await import('./src/lib/supabase.js');
+  const user = await getUser();
+  if (!user) {
+    document.getElementById('auth-modal').hidden = false;
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'saving…';
+
+  const rawText = document.getElementById('gift-cards-container')?.getAttribute('data-raw') || '{}';
+  let parsed;
+  try { parsed = JSON.parse(rawText); } catch { parsed = {}; }
+
+  const result = await saveSearch(lastFormData, parsed);
+  if (result) {
+    btn.textContent = '✓ saved!';
+    btn.classList.add('saved');
+    setTimeout(() => {
+      btn.textContent = '💾 save search';
+      btn.disabled = false;
+      btn.classList.remove('saved');
+    }, 2000);
+  } else {
+    btn.textContent = 'failed to save';
+    btn.disabled = false;
+    setTimeout(() => { btn.textContent = '💾 save search'; }, 2000);
+  }
+});
+
 // ── Edit choices ────────────────────────────────────────────────
 document.getElementById('edit-choices-btn').addEventListener('click', () => {
   hideResults();
@@ -817,6 +916,7 @@ document.getElementById('start-over-btn').addEventListener('click', () => {
   if (customPills) customPills.innerHTML = '';
   conversationHistory = [];
   chipEdits = {};
+  sessionStorage.removeItem('giftlocal_last_results');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
@@ -839,8 +939,10 @@ async function runRequest(provider, apiKey) {
       result = await getGiftSuggestions(apiKey, conversationHistory, SYSTEM_PROMPT);
     }
     const { rawText, parsed } = result;
+    incrementGuestSearch(); // Track AI search usage
     renderResults(parsed, rawText, lastFormData);
     buildSummaryBar(lastFormData);
+    saveToSession(parsed, rawText, lastFormData);
     showResults();
     document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (err) {
@@ -851,6 +953,7 @@ async function runRequest(provider, apiKey) {
       const rawText = JSON.stringify(parsed);
       renderResults(parsed, rawText, lastFormData);
       buildSummaryBar(lastFormData);
+      saveToSession(parsed, rawText, lastFormData);
       showResults();
       document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (fallbackErr) {
@@ -865,6 +968,21 @@ async function runRequest(provider, apiKey) {
     btn.disabled = false;
   }
 }
+
+// ── Restore results on page refresh ─────────────────────────────
+try {
+  const saved = sessionStorage.getItem('giftlocal_last_results');
+  if (saved) {
+    const { formData, parsed, rawText } = JSON.parse(saved);
+    if (parsed && formData) {
+      lastFormData = formData;
+      renderResults(parsed, rawText, formData);
+      buildSummaryBar(formData);
+      hideForm();
+      showResults();
+    }
+  }
+} catch (e) { /* ignore */ }
 </script>
 
 </body>

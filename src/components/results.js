@@ -91,7 +91,10 @@ function buildGiftCard(gift, location, index) {
   card.innerHTML = `
     <div class="gift-card-top">
       <div class="gift-name">${escapeHtml(gift.name)}</div>
-      <div class="gift-price">${escapeHtml(gift.price)}</div>
+      <div class="gift-card-top-right">
+        <div class="gift-price">${escapeHtml(gift.price)}</div>
+        <button class="wishlist-heart" title="Add to wishlist">♡</button>
+      </div>
     </div>
     <span class="gift-type-badge ${typeClass}">${escapeHtml(gift.type || 'Gift')}</span>
     <p class="gift-why">
@@ -102,6 +105,29 @@ function buildGiftCard(gift, location, index) {
     </p>
     ${searchHtml}
   `;
+
+  // Wishlist heart click — gift data stored in closure, not in HTML attribute
+  const heartBtn = card.querySelector('.wishlist-heart');
+  heartBtn.addEventListener('click', async () => {
+    const { addToWishlist, removeFromWishlist, getUser } = await import('../lib/supabase.js');
+    const user = await getUser();
+    if (!user) {
+      document.getElementById('auth-modal').hidden = false;
+      return;
+    }
+    if (heartBtn.classList.contains('hearted')) {
+      heartBtn.classList.remove('hearted');
+      heartBtn.textContent = '♡';
+      if (heartBtn._wishlistId) {
+        await removeFromWishlist(heartBtn._wishlistId);
+      }
+    } else {
+      heartBtn.classList.add('hearted');
+      heartBtn.textContent = '♥';
+      const result = await addToWishlist(null, gift);
+      if (result) heartBtn._wishlistId = result.id;
+    }
+  });
 
   return card;
 }
