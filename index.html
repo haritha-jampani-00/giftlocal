@@ -755,12 +755,14 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
 
   // Priority: Groq (free) → Gemini (free) → Anthropic (paid) → Local static (fallback)
   const groqKey = window.GIFTLOCAL_CONFIG?.groqKey;
+  const isDeployed = location.hostname !== 'localhost' && location.hostname !== '127.0.0.1';
   const geminiKey = getGeminiKey();
   const anthropicKey = getApiKey();
 
-  if (groqKey) {
+  // On Vercel: use proxy (no client key needed). Locally: need groqKey in config.
+  if (groqKey || isDeployed) {
     conversationHistory = [{ role: 'user', content: buildUserMessage(lastFormData) }];
-    await runRequest('groq', groqKey);
+    await runRequest('groq', groqKey || 'proxy');
     return;
   }
 
