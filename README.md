@@ -1,144 +1,120 @@
-# 🎁 GiftLocal
+# GiftLocal
 
-> AI-powered gift recommendations rooted in where the recipient lives.
+**AI-powered gift recommendations rooted in where the recipient lives.**
 
-Gift suggestions that feel like advice from a well-traveled local friend — not a generic list.
+Find thoughtful, locally-aware gift ideas for anyone, anywhere. Tell us about the person — we'll suggest gifts that feel personal, not picked off a generic list.
 
----
-
-## Name ideas (all .com availability worth checking)
-
-| Name | Vibe | Why it works |
-|------|------|--------------|
-| **GiftLocal** | Warm, clear | Does exactly what it says |
-| **Lokra** | Invented, short | Lok (local) + ra (Sanskrit: give). Memorable, brandable |
-| **Whereto.gift** | Descriptive | "Where to gift" — clever use of .gift TLD |
-| **Nearand.co** | Poetic | "Near and dear" implied |
-| **Giftroo** | Playful | Short, sounds friendly, easy to say |
-| **Lokalgi** | Unique | Local + gift, feels international |
-| **Heregift** | Direct | Simple, search-friendly |
-| **Giftsense** | Smart | Implies intelligence + local sense |
-
-**My pick for launch: `Lokra`** — short, invented, no baggage, works globally.
+**Live:** [giftlocal.vercel.app](https://giftlocal.vercel.app)
 
 ---
 
-## What this is
+## Features
 
-A single-page web app where you enter:
-- Who you're buying for (age, relationship, personality words)
-- Where they live (city + country)
-- Your budget
-- The occasion
-
-And get 5 thoughtful, location-aware gift suggestions powered by Claude AI — including at least one local experience and one locally-made item, with live search links.
-
----
-
-## Tech stack
-
-- **Frontend**: Vanilla HTML + CSS + JS (zero dependencies, zero build step)
-- **AI**: Claude Haiku via Anthropic API
-- **Web search**: Anthropic's built-in web search tool (live local results)
-- **Hosting**: Vercel / Netlify free tier
-- **Cost**: ~$0.001 per request (Haiku pricing)
+- **AI-powered suggestions** — Groq Llama 3.3 generates 5 curated gifts per search, with Claude Haiku and Gemini as fallbacks
+- **Location-aware** — prices in local currency, city-specific experiences and crafts
+- **Smart form** — 24 occasions, 22 relationships, 20 interest tags, custom personality input
+- **Baby mode** — entering age 0–2 dynamically switches options to baby-appropriate occasions, relationships, and gifts
+- **Carousel results** — horizontal swipe/scroll cards with category filtering
+- **Refine with feedback** — type "more outdoorsy" or "skip group activities" and results update
+- **90+ local gift fallback** — curated database works without any API key
+- **Serverless proxy** — Vercel function hides API keys, with rate limiting (10 req/min) and bot protection
+- **4 currencies** — USD, GBP, EUR, INR with region-aware search links
+- **SEO ready** — sitemap, robots.txt, OG tags, Google Search Console verified
 
 ---
 
-## Project structure
+## Tech Stack
+
+| Layer | Tech |
+|-------|------|
+| Frontend | Vanilla HTML, CSS, JS (ES modules) — zero frameworks, zero build step |
+| AI | Groq (Llama 3.3 70B) → Google Gemini → Anthropic Claude Haiku (fallback chain) |
+| Backend | Vercel Serverless Functions (API proxy) |
+| Hosting | Vercel |
+| Analytics | Vercel Analytics |
+| Fonts | Google Fonts (Quicksand, Caveat) |
+
+---
+
+## Quick Start
+
+### Run locally
+```bash
+git clone https://github.com/haritha-jampani-00/giftlocal
+cd giftlocal
+open index.html
+```
+
+For AI-powered results locally, uncomment and add your Groq key in `index.html` line 58.
+
+### Deploy to Vercel
+```bash
+npm i -g vercel
+vercel
+```
+Then add `GROQ_API_KEY` in Vercel → Settings → Environment Variables.
+
+---
+
+## Architecture
 
 ```
 giftlocal/
-├── README.md
-├── index.html              ← main app (open this in browser)
+├── index.html                  ← Single page app
+├── api/
+│   └── suggest.js              ← Vercel serverless proxy (rate limited, bot protected)
 ├── src/
 │   ├── lib/
-│   │   ├── api.js          ← Claude API call + web search
-│   │   └── prompt.js       ← system prompt (the core logic)
+│   │   ├── prompt.js           ← Core system prompt (4-layer reasoning)
+│   │   ├── groq.js             ← Groq API integration
+│   │   ├── gemini.js           ← Google Gemini fallback
+│   │   ├── api.js              ← Anthropic Claude integration
+│   │   └── gifts.js            ← Local gift database (90+ items)
 │   ├── components/
-│   │   ├── form.js         ← input form + pill tags
-│   │   └── results.js      ← gift card rendering
+│   │   ├── form.js             ← Form logic, validation, dynamic baby mode
+│   │   └── results.js          ← Carousel rendering, category tabs, search links
 │   └── styles/
-│       └── main.css        ← all styles
+│       └── main.css            ← Pastel theme, animations, responsive
 ├── public/
-│   └── favicon.svg
-└── .env.example            ← environment variable template
+│   ├── sitemap.xml
+│   ├── robots.txt
+│   └── og-image.svg
+└── vercel.json                 ← Security headers, routing
 ```
 
 ---
 
-## Quick start (3 minutes)
+## How the AI Prompt Works
 
-### Option A — Open directly in browser (easiest)
-1. Clone or download this repo
-2. Open `index.html` in your browser
-3. Enter your Anthropic API key when prompted (stored in `localStorage`, never sent anywhere except Anthropic)
-4. Done
+The system prompt uses a 4-layer reasoning approach:
 
-### Option B — Deploy to Vercel (recommended for sharing)
-```bash
-# 1. Install Vercel CLI
-npm i -g vercel
-
-# 2. Clone and deploy
-git clone https://github.com/yourusername/giftlocal
-cd giftlocal
-vercel
-
-# 3. Add environment variable in Vercel dashboard
-# ANTHROPIC_API_KEY = your key
-```
-
-### Option C — GitHub Pages (static, free)
-1. Fork this repo
-2. Go to Settings → Pages → Deploy from main branch
-3. Add API key in `index.html` line marked `CONFIG`
+1. **Cultural Lens** — What's culturally significant in this city? What season is it? Any local festivals?
+2. **Local Radar** — What experiences and locally-made things exist here? (with real search paths, never invented business names)
+3. **Thoughtfulness Engine** — Why would THIS person love this gift? Connects personality → city → occasion
+4. **Anti-Generic Filter** — Removes anything that would appear on a generic listicle. A chocolate-making class in Brussels passes. A box of chocolates does not.
 
 ---
 
-## Getting a free API key
+## Roadmap
 
-1. Go to `platform.anthropic.com`
-2. Sign up — **no credit card required**
-3. You get **$5 free credits** (≈ 7,500 gift suggestions at Haiku pricing)
-4. Copy your API key from the dashboard
-5. Paste into `index.html` where it says `YOUR_API_KEY_HERE`
-
----
-
-## Validate first (free, no key needed)
-
-Before deploying anything, test the prompt manually:
-
-1. Open `src/lib/prompt.js`
-2. Copy the system prompt
-3. Go to claude.ai
-4. Start a new chat, paste the system prompt, then send a test request like:
-
-```
-OCCASION: Birthday
-RECIPIENT: Age 29, best friend, personality: adventurous, minimalist, plant-lover
-LOCATION: Kyoto, Japan
-BUDGET: ¥5000–8000
-EXTRA: She just started getting into ceramics
-```
-
-5. Share the output with 5 real people. If 3+ say "that's actually good" — build it.
+- [ ] **User accounts** — Google + email sign-in via Firebase
+- [ ] **Save searches** — Revisit past gift searches
+- [ ] **Wishlist** — Bookmark individual gift ideas
+- [ ] **Share results** — Shareable link to gift suggestions
+- [ ] **Custom domain** — giftlocal.co
+- [ ] **Experience listings** — Local businesses can submit experiences
+- [ ] **Affiliate integration** — Amazon Associates for purchase links
 
 ---
 
-## The business model (when ready)
+## Business Model
 
-- **Phase 1**: Free tool, build traffic
-- **Phase 2**: Local experience providers can submit listings (simple form → Airtable)
-- **Phase 3**: Featured listings (£20-50/month per business)
-- **Phase 4**: Click-through fees or booking commission
-
----
-
-## Contributing / listing your experience
-
-Email `hello@giftlocal.co` or open an issue.
+| Phase | What | Revenue |
+|-------|------|---------|
+| 1 | Free tool, build traffic | $0 |
+| 2 | Local experience providers submit listings | Free |
+| 3 | Featured/promoted listings | $20–50/month per business |
+| 4 | Booking commission on experiences | 5–10% per booking |
 
 ---
 
