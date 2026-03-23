@@ -93,7 +93,7 @@ HARD RULES
 - At least 1 must be type: Experience  
 - At least 1 must be type: Local craft
 - Never suggest the same category twice
-- Prices always in recipient's local currency
+- Prices always in recipient's local currency and MUST be within the stated budget range. If budget is ₹23000, suggest gifts around ₹15000–23000, not ₹1200
 - If the city is small or unfamiliar: be honest — "I know less about [city] specifically, so here's what I'd look for..." 
 - Never invent specific business names unless you are certain they exist (famous institutions only)
 - AGE MATTERS: For babies (0-1), suggest only baby-safe items like soft toys, sensory items, keepsakes, baby clothes, parent-helpful gifts. For young children (2-5), suggest age-appropriate toys, books, experiences. Never suggest alcohol, sharp objects, or adult experiences for children.`;
@@ -106,7 +106,7 @@ export function buildUserMessage({ occasion, age, relationship, personality, loc
   return `OCCASION: ${occasion}
 RECIPIENT: Age ${age}, ${relationship}, personality: ${personality}
 LOCATION: ${location}
-BUDGET: ${budget}
+BUDGET: ${budget} — IMPORTANT: ALL gift prices must be within or close to this budget. Do not suggest gifts significantly below this amount.
 EXTRA: ${extra || 'Nothing specific'}`;
 }
 
