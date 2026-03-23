@@ -220,24 +220,39 @@
           <option value="">pick one ~</option>
           <option>Birthday</option>
           <option>Anniversary</option>
+          <option>Wedding</option>
+          <option>Engagement</option>
           <option>New job / promotion</option>
           <option>Housewarming</option>
-          <option>Wedding</option>
           <option>Graduation</option>
           <option>Holiday / Christmas</option>
-          <option>Just because</option>
-          <option>Thank you</option>
+          <option>New year</option>
+          <option>Diwali</option>
+          <option>Eid</option>
+          <option>Valentine's Day</option>
           <option>Mother's Day</option>
           <option>Father's Day</option>
-          <option>Valentine's Day</option>
+          <option>Thank you</option>
+          <option>Congratulations</option>
+          <option>Farewell / Going away</option>
+          <option>Get well soon</option>
           <option>New baby</option>
+          <option>Baby shower</option>
+          <option>Baptism / Naming ceremony</option>
           <option>Retirement</option>
+          <option>Just because</option>
         </select>
       </div>
 
       <div class="form-group">
         <label for="age">their age</label>
-        <input type="number" id="age" placeholder="e.g. 32" min="1" max="110"/>
+        <div class="age-input-wrap">
+          <input type="number" id="age" placeholder="e.g. 32" min="0" max="110"/>
+          <select id="age-unit" class="age-unit-select">
+            <option value="years">years</option>
+            <option value="months">months</option>
+          </select>
+        </div>
       </div>
 
       <div class="form-group">
@@ -246,13 +261,23 @@
           <option value="">who are they? ~</option>
           <option>Best friend</option>
           <option>Partner / spouse</option>
+          <option>Boyfriend / Girlfriend</option>
+          <option>Fiancé</option>
           <option>Parent</option>
           <option>Sibling</option>
+          <option>Son / Daughter</option>
+          <option>Nephew / Niece</option>
+          <option>Cousin</option>
+          <option>Grandchild</option>
+          <option>Godchild</option>
+          <option>Grandparent</option>
           <option>Colleague</option>
           <option>Boss / mentor</option>
-          <option>Child</option>
-          <option>Grandparent</option>
+          <option>Teacher</option>
+          <option>Roommate</option>
           <option>Friend</option>
+          <option>Friend's baby</option>
+          <option>Neighbour</option>
           <option>Acquaintance</option>
         </select>
       </div>
@@ -354,6 +379,7 @@
       <button class="refine-btn" id="refine-btn">refine ✨</button>
     </div>
 
+    <span class="results-count" id="results-count"></span>
     <div class="category-tabs" id="category-tabs">
       <button class="cat-tab active" data-category="all">🌟 All</button>
       <button class="cat-tab" data-category="Experience">🎟️ Experiences</button>
@@ -761,8 +787,23 @@ document.getElementById('edit-choices-btn').addEventListener('click', () => {
 });
 
 // ── Regenerate ──────────────────────────────────────────────────
-document.getElementById('regenerate-btn').addEventListener('click', () => {
-  document.getElementById('submit-btn').click();
+document.getElementById('regenerate-btn').addEventListener('click', async () => {
+  if (!lastFormData) return;
+
+  const groqKey = window.GIFTLOCAL_CONFIG?.groqKey;
+
+  if (groqKey) {
+    // Ask Groq for different suggestions
+    conversationHistory = [{
+      role: 'user',
+      content: buildUserMessage(lastFormData) + '\n\nIMPORTANT: Give me 5 COMPLETELY DIFFERENT gift suggestions from what you suggested before. Be creative and surprising.'
+    }];
+    await runRequest('groq', groqKey);
+  } else {
+    // Local engine: shuffle by adding a random seed
+    window._giftLocalSeed = (window._giftLocalSeed || 0) + 1;
+    document.getElementById('submit-btn').click();
+  }
 });
 
 // ── Start over ──────────────────────────────────────────────────

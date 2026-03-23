@@ -92,6 +92,20 @@ const GIFT_DB = [
   { name: "Meal kit subscription (1 month)", price: 60, type: "Subscription", tags: ["foodie", "cooking", "busy", "practical", "adventurous"], occasions: ["Birthday", "Housewarming", "Holiday / Christmas"], ageRange: [22, 55], where: "HelloFresh, Gousto, Blue Apron, or a local meal kit service" },
   { name: "Flower subscription (monthly delivery)", price: 40, type: "Subscription", tags: ["botanical", "nature", "elegant", "cozy", "aesthetic"], occasions: ["Birthday", "Mother's Day", "Anniversary", "Thank you", "Get well soon"], ageRange: [22, 75], where: "Bloom & Wild, The Bouqs Co, or a local florist with delivery" },
 
+  // ── Newborns & Infants (0–1) ───────────────────────────────────
+  { name: "Organic cotton muslin swaddle set", price: 30, type: "Physical gift", tags: ["cozy", "practical", "minimalist", "comfort"], occasions: ["Baby shower", "Birthday", "Just because", "New baby"], ageRange: [0, 1], where: "Local baby boutiques or search for organic muslin swaddles online" },
+  { name: "Handmade baby rattle (wooden or crochet)", price: 18, type: "Local craft", tags: ["creative", "sentimental", "fun", "minimalist"], occasions: ["Baby shower", "Birthday", "New baby", "Just because"], ageRange: [0, 1], where: "Search for handmade baby rattles from local makers or on Etsy" },
+  { name: "Baby footprint or handprint keepsake kit", price: 22, type: "Local craft", tags: ["sentimental", "family", "creative", "nostalgic"], occasions: ["Baby shower", "Birthday", "New baby", "Holiday / Christmas"], ageRange: [0, 1], where: "Local baby stores or search for baby keepsake kits online" },
+  { name: "Black and white contrast cards for newborns", price: 12, type: "Physical gift", tags: ["educational", "curious", "minimalist"], occasions: ["Baby shower", "New baby", "Just because"], ageRange: [0, 1], where: "Local bookshops or search for high contrast baby cards online" },
+  { name: "Personalised baby blanket with name", price: 35, type: "Local craft", tags: ["cozy", "sentimental", "comfort", "minimalist"], occasions: ["Baby shower", "Birthday", "New baby", "Holiday / Christmas"], ageRange: [0, 2], where: "Search for personalised baby blankets from independent makers" },
+  { name: "Milestone card set (first year moments)", price: 15, type: "Physical gift", tags: ["sentimental", "family", "creative", "nostalgic"], occasions: ["Baby shower", "New baby", "Birthday"], ageRange: [0, 1], where: "Local stationery shops or search for baby milestone cards online" },
+  { name: "Crinkle fabric soft book", price: 14, type: "Physical gift", tags: ["educational", "fun", "creative", "bookish"], occasions: ["Baby shower", "Birthday", "New baby", "Just because"], ageRange: [0, 1], where: "Local bookshops or baby stores, or search for baby crinkle books" },
+  { name: "Organic baby skincare gift set", price: 28, type: "Physical gift", tags: ["practical", "self-care", "minimalist", "healthy"], occasions: ["Baby shower", "New baby", "Birthday"], ageRange: [0, 1], where: "Local pharmacies or search for organic baby skincare sets" },
+  { name: "Silicone teething toy set", price: 16, type: "Physical gift", tags: ["practical", "fun", "comfort"], occasions: ["Baby shower", "Birthday", "New baby", "Just because"], ageRange: [0, 1], where: "Local baby stores or search for silicone teethers online" },
+  { name: "Newborn baby photo session gift voucher", price: 50, type: "Experience", tags: ["sentimental", "creative", "family", "artsy"], occasions: ["Baby shower", "New baby", "Birthday"], ageRange: [0, 1], where: "Search for newborn photographers in their area" },
+  { name: "Star map poster of baby's birth date", price: 30, type: "Local craft", tags: ["sentimental", "nerdy", "artsy", "nostalgic", "creative"], occasions: ["Baby shower", "New baby", "Birthday"], ageRange: [0, 2], where: "Search for custom star map prints from independent artists online" },
+  { name: "Wooden baby gym (Montessori style)", price: 45, type: "Physical gift", tags: ["educational", "minimalist", "creative", "hands-on"], occasions: ["Baby shower", "New baby", "Birthday"], ageRange: [0, 1], where: "Local baby boutiques or search for wooden baby gyms online" },
+
   // ── Babies & Toddlers (0–3) ────────────────────────────────────
   { name: "Personalised name puzzle (wooden)", price: 25, type: "Local craft", tags: ["creative", "educational", "fun", "hands-on"], occasions: ["Birthday", "Holiday / Christmas", "Baby shower", "Just because"], ageRange: [1, 4], where: "Search for personalised wooden name puzzles at local toy shops or online" },
   { name: "Soft sensory play mat", price: 35, type: "Physical gift", tags: ["creative", "active", "fun", "educational"], occasions: ["Birthday", "Holiday / Christmas", "Baby shower"], ageRange: [0, 3], where: "Local baby stores or search for sensory play mats online" },
@@ -180,8 +194,16 @@ export function getLocalRecommendations({ occasion, age, relationship, personali
   const budgetRange = parseBudget(budget);
   const { boostTags, avoidTags } = parseExtraSignals(extra);
 
-  const scored = GIFT_DB.map(gift => {
+  // Add randomness on regenerate to get different results
+  const seed = window._giftLocalSeed || 0;
+
+  const scored = GIFT_DB.map((gift, i) => {
     let score = 0;
+
+    // Add deterministic randomness based on seed
+    if (seed > 0) {
+      score += ((i * 7 + seed * 13) % 5) - 2;
+    }
 
     // Age — hard filter: skip gifts outside age range
     if (ageNum < gift.ageRange[0] || ageNum > gift.ageRange[1]) {
@@ -302,9 +324,43 @@ function buildWhyText(gift, personalityWords, occasion, relationship, boostTags)
     gift.tags.some(tag => tag.includes(bt) || bt.includes(tag))
   );
 
+  // Gift-specific descriptions based on type
+  const typeReasons = {
+    'Experience': [
+      `This creates a memory, not more clutter`,
+      `Experiences stick with people longer than things do`,
+      `Something to look forward to and talk about after`,
+    ],
+    'Local craft': [
+      `Handmade things carry a story that factory goods never will`,
+      `Supporting a local maker adds meaning to the gift`,
+      `There's something special about owning a one-of-a-kind piece`,
+    ],
+    'Physical gift': [
+      `Something they'll actually reach for and use regularly`,
+      `Practical but with a personal touch that elevates it`,
+      `The kind of thing people love but rarely buy for themselves`,
+    ],
+    'Food & drink': [
+      `Food is personal — it's about sharing a taste of something special`,
+      `A delicious way to explore flavours they wouldn't pick themselves`,
+      `Nothing brings people together quite like good food`,
+    ],
+    'Subscription': [
+      `The gift that keeps arriving — a little joy every month`,
+      `Spreads the excitement over weeks instead of one moment`,
+      `Each delivery is a fresh surprise`,
+    ],
+  };
+
+  // Pick a reason based on gift name hash to vary it
+  const hash = gift.name.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const typeReasonsArr = typeReasons[gift.type] || typeReasons['Physical gift'];
+  const typeReason = typeReasonsArr[hash % typeReasonsArr.length];
+
   let traitStr;
   if (matchedTraits.length > 0) {
-    traitStr = `Perfect for someone who's ${matchedTraits.join(' and ')}`;
+    traitStr = `Perfect for someone who's ${matchedTraits.join(' and ')}. ${typeReason}`;
   } else if (matchedBoosts.length > 0) {
     const boostDescriptions = {
       introverted: 'enjoys their own space', mindful: 'values mindfulness', cozy: 'loves cozy comforts',
@@ -312,13 +368,31 @@ function buildWhyText(gift, personalityWords, occasion, relationship, boostTags)
       homebody: 'loves being at home', sentimental: 'values meaningful gestures', practical: 'appreciates practical things'
     };
     const desc = matchedBoosts.map(b => boostDescriptions[b] || b).slice(0, 2).join(' and ');
-    traitStr = `Great for someone who ${desc}`;
+    traitStr = `Great for someone who ${desc}. ${typeReason}`;
   } else {
-    traitStr = 'A thoughtful choice that shows you put real thought into this';
+    traitStr = typeReason;
   }
 
-  const occasionStr = occasion ? ` — especially fitting for a ${occasion.toLowerCase()}` : '';
-  return `${traitStr}${occasionStr}. This is the kind of gift that feels personal rather than picked off a generic list.`;
+  const occasionPhrases = {
+    'Birthday': 'Makes a birthday feel truly personal',
+    'Anniversary': 'A meaningful way to mark the milestone',
+    'Wedding': 'Stands out from the usual wedding gift pile',
+    'Baby shower': 'Something the parents will genuinely appreciate',
+    'New baby': 'Useful and sweet for the newest arrival',
+    'First birthday': 'A lovely way to celebrate their very first year',
+    'Holiday / Christmas': 'Feels festive without being generic',
+    'Valentine\'s Day': 'Romantic without being cliché',
+    'Mother\'s Day': 'Shows you really know her',
+    'Father\'s Day': 'Beyond the usual socks and ties',
+    'Graduation': 'Marks the start of something new',
+    'Retirement': 'Celebrates the freedom ahead',
+    'Housewarming': 'Helps make the new place feel like home',
+    'Thank you': 'Goes beyond a simple thank-you card',
+    'Just because': 'The best gifts are the unexpected ones',
+  };
+
+  const occasionStr = occasionPhrases[occasion] || '';
+  return occasionStr ? `${traitStr}. ${occasionStr}.` : `${traitStr}.`;
 }
 
 function buildStarPick(gift, personalityWords, cityName, occasion) {

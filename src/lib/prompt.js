@@ -95,7 +95,8 @@ HARD RULES
 - Never suggest the same category twice
 - Prices always in recipient's local currency
 - If the city is small or unfamiliar: be honest — "I know less about [city] specifically, so here's what I'd look for..." 
-- Never invent specific business names unless you are certain they exist (famous institutions only)`;
+- Never invent specific business names unless you are certain they exist (famous institutions only)
+- AGE MATTERS: For babies (0-1), suggest only baby-safe items like soft toys, sensory items, keepsakes, baby clothes, parent-helpful gifts. For young children (2-5), suggest age-appropriate toys, books, experiences. Never suggest alcohol, sharp objects, or adult experiences for children.`;
 
 /**
  * Builds the user message from form data.

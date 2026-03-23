@@ -52,6 +52,93 @@ export function initForm() {
 
   // ── Location suggestions (pill-style) ────────────────────────
   initLocationSuggestions();
+
+  // ── Dynamic age-based dropdown switching ────────────────────
+  const ageInput = document.getElementById('age');
+  const ageUnit = document.getElementById('age-unit');
+  const occasionSelect = document.getElementById('occasion');
+  const relationshipSelect = document.getElementById('relationship');
+
+  const BABY_OCCASIONS = [
+    '', 'Birthday', 'First birthday', 'Baby shower', 'Baptism / Naming ceremony',
+    'New baby', 'Holiday / Christmas', 'Diwali', 'Eid', 'New year', 'Just because'
+  ];
+  const BABY_OCCASION_LABELS = [
+    'pick one ~', 'Birthday', 'First birthday', 'Baby shower', 'Baptism / Naming ceremony',
+    'New baby', 'Holiday / Christmas', 'Diwali', 'Eid', 'New year', 'Just because'
+  ];
+
+  const BABY_RELATIONSHIPS = [
+    '', 'Son / Daughter', 'Nephew / Niece', 'Godchild', 'Grandchild',
+    'Cousin\'s baby', 'Friend\'s baby', 'Neighbour\'s baby'
+  ];
+  const BABY_RELATIONSHIP_LABELS = [
+    'who are they? ~', 'Son / Daughter', 'Nephew / Niece', 'Godchild', 'Grandchild',
+    'Cousin\'s baby', 'Friend\'s baby', 'Neighbour\'s baby'
+  ];
+
+  let defaultOccasionHTML = occasionSelect.innerHTML;
+  let defaultRelationshipHTML = relationshipSelect.innerHTML;
+  let isBabyMode = false;
+
+  function checkBabyMode() {
+    const age = parseInt(ageInput.value);
+    const unit = ageUnit.value;
+    const shouldBeBaby = unit === 'months' || (unit === 'years' && age >= 0 && age <= 2);
+
+    if (shouldBeBaby && !isBabyMode) {
+      const prevOccasion = occasionSelect.value;
+      const prevRelationship = relationshipSelect.value;
+      isBabyMode = true;
+      occasionSelect.innerHTML = BABY_OCCASIONS.map((v, i) =>
+        `<option value="${v}">${BABY_OCCASION_LABELS[i]}</option>`
+      ).join('');
+      relationshipSelect.innerHTML = BABY_RELATIONSHIPS.map((v, i) =>
+        `<option value="${v}">${BABY_RELATIONSHIP_LABELS[i]}</option>`
+      ).join('');
+      // Restore previous value if it exists in baby options
+      if (BABY_OCCASIONS.includes(prevOccasion)) occasionSelect.value = prevOccasion;
+      if (BABY_RELATIONSHIPS.includes(prevRelationship)) relationshipSelect.value = prevRelationship;
+      showBabyHint(true);
+    } else if (!shouldBeBaby && isBabyMode) {
+      const prevOccasion = occasionSelect.value;
+      const prevRelationship = relationshipSelect.value;
+      isBabyMode = false;
+      occasionSelect.innerHTML = defaultOccasionHTML;
+      relationshipSelect.innerHTML = defaultRelationshipHTML;
+      // Restore previous value if it exists in default options
+      const defaultOccasionValues = [...occasionSelect.options].map(o => o.value);
+      const defaultRelationshipValues = [...relationshipSelect.options].map(o => o.value);
+      if (defaultOccasionValues.includes(prevOccasion)) occasionSelect.value = prevOccasion;
+      if (defaultRelationshipValues.includes(prevRelationship)) relationshipSelect.value = prevRelationship;
+      showBabyHint(false);
+    }
+  }
+
+  let babyDebounce = null;
+  ageInput.addEventListener('input', () => {
+    clearTimeout(babyDebounce);
+    babyDebounce = setTimeout(checkBabyMode, 1200);
+  });
+  ageUnit.addEventListener('change', checkBabyMode);
+}
+
+function showBabyHint(show) {
+  let hint = document.getElementById('baby-mode-hint');
+  if (show) {
+    if (!hint) {
+      hint = document.createElement('div');
+      hint.id = 'baby-mode-hint';
+      hint.className = 'baby-hint';
+      hint.innerHTML = '🍼 switched to baby options for occasion & relationship!';
+      const ageGroup = document.getElementById('age').closest('.form-group');
+      ageGroup.after(hint);
+    }
+    hint.classList.add('visible');
+  } else if (hint) {
+    hint.classList.remove('visible');
+    setTimeout(() => hint.remove(), 300);
+  }
 }
 
 function getTotalSelected() {
@@ -105,13 +192,21 @@ export function validateForm() {
     }
   }
 
-  if (getTotalSelected() === 0) {
+  const age = parseInt(document.getElementById('age').value);
+  const ageUnit = document.getElementById('age-unit')?.value || 'years';
+  const isBaby = ageUnit === 'months' || (ageUnit === 'years' && age >= 0 && age <= 2);
+
+  if (!isBaby && getTotalSelected() === 0) {
     return { valid: false, error: 'Pick at least one interest — it\'s what makes suggestions feel personal.' };
   }
-
-  const age = parseInt(document.getElementById('age').value);
-  if (isNaN(age) || age < 1 || age > 120) {
-    return { valid: false, error: 'Please enter a valid age.' };
+  if (ageUnit === 'months') {
+    if (isNaN(age) || age < 0 || age > 23) {
+      return { valid: false, error: 'Please enter months between 0 and 23.' };
+    }
+  } else {
+    if (isNaN(age) || age < 0 || age > 120) {
+      return { valid: false, error: 'Please enter a valid age.' };
+    }
   }
 
   const budgetText = document.getElementById('budget').value;
@@ -130,7 +225,7 @@ export function getFormData() {
   const budgetAmount = document.getElementById('budget').value;
   return {
     occasion:     document.getElementById('occasion').value,
-    age:          document.getElementById('age').value,
+    age:          document.getElementById('age').value + ' ' + (document.getElementById('age-unit')?.value || 'years'),
     relationship: document.getElementById('relationship').value,
     currency:     currency,
     budget:       `${currency}${budgetAmount}`,

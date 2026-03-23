@@ -16,8 +16,11 @@ export function renderResults(data, rawText, formData) {
   const cityName = formData.location.split(',')[0].trim();
 
   // Update header
+  const giftCount = (data.gifts || []).length;
   document.getElementById('results-title').textContent =
     `Gifts for your ${formData.relationship.toLowerCase()} in ${cityName}`;
+  document.getElementById('results-count').textContent =
+    `${giftCount} idea${giftCount !== 1 ? 's' : ''} found`;
   document.getElementById('results-sub').textContent =
     data.city_line || '';
 
@@ -31,17 +34,35 @@ export function renderResults(data, rawText, formData) {
   container.setAttribute('data-raw', rawText);
   container.innerHTML = '';
 
-  // Create grid wrapper
-  const grid = document.createElement('div');
-  grid.className = 'gift-cards-grid';
+  // Create carousel wrapper
+  const carousel = document.createElement('div');
+  carousel.className = 'gift-carousel';
+  carousel.id = 'gift-carousel';
 
-  // Render each gift card with staggered animation
+  const track = document.createElement('div');
+  track.className = 'gift-carousel-track';
+
+  // Render each gift card
   (data.gifts || []).forEach((gift, i) => {
     const card = buildGiftCard(gift, formData.location, i);
-    grid.appendChild(card);
+    track.appendChild(card);
   });
 
-  container.appendChild(grid);
+  carousel.appendChild(track);
+  container.appendChild(carousel);
+
+  // Add navigation arrows
+  const nav = document.createElement('div');
+  nav.className = 'carousel-nav';
+  nav.innerHTML = `
+    <button class="carousel-arrow carousel-prev" id="carousel-prev" aria-label="Previous">‹</button>
+    <div class="carousel-dots" id="carousel-dots"></div>
+    <button class="carousel-arrow carousel-next" id="carousel-next" aria-label="Next">›</button>
+  `;
+  container.appendChild(nav);
+
+  // Carousel logic
+  initCarousel(track, data.gifts?.length || 0);
 
   // Star pick
   const starSection = document.getElementById('star-pick');
@@ -201,4 +222,70 @@ function escapeHtml(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+/**
+ * Initialize carousel — uses native scroll with dots/arrows synced.
+ */
+function initCarousel(track, totalCards) {
+  let currentIndex = 0;
+  const carousel = document.getElementById('gift-carousel');
+  const prevBtn = document.getElementById('carousel-prev');
+  const nextBtn = document.getElementById('carousel-next');
+  const dotsContainer = document.getElementById('carousel-dots');
+
+  // Create dots
+  dotsContainer.innerHTML = '';
+  for (let i = 0; i < totalCards; i++) {
+    const dot = document.createElement('button');
+    dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Gift ${i + 1}`);
+    dot.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(dot);
+  }
+
+  function goTo(index) {
+    currentIndex = Math.max(0, Math.min(index, totalCards - 1));
+    const card = track.children[currentIndex];
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+    updateDots();
+    updateArrows();
+  }
+
+  function updateDots() {
+    dotsContainer.querySelectorAll('.carousel-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  function updateArrows() {
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex >= totalCards - 1;
+  }
+
+  prevBtn.addEventListener('click', () => goTo(currentIndex - 1));
+  nextBtn.addEventListener('click', () => goTo(currentIndex + 1));
+
+  // Sync dots/arrows when user scrolls with trackpad/touch/mouse
+  carousel.addEventListener('scroll', () => {
+    const cardWidth = track.children[0]?.offsetWidth || 340;
+    const gap = 16;
+    const newIndex = Math.round(carousel.scrollLeft / (cardWidth + gap));
+    if (newIndex !== currentIndex && newIndex >= 0 && newIndex < totalCards) {
+      currentIndex = newIndex;
+      updateDots();
+      updateArrows();
+    }
+  }, { passive: true });
+
+  // Keyboard support
+  carousel.setAttribute('tabindex', '0');
+  carousel.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(currentIndex - 1); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); goTo(currentIndex + 1); }
+  });
+
+  updateArrows();
 }
